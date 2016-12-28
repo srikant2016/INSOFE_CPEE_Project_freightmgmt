@@ -5,16 +5,16 @@ rm(list=ls(all=TRUE))
 setwd("D:\\github_repo\\INSOFE_CPEE_Project_freightmgmt")
 
 # Reads all Data
-spotfreight <- read.csv("spotfreightdata.csv",header=T, na.strings = c("","NA"," "))
-regionlookups <- read.csv("regionlookups.csv",header=T, na.strings = c("","NA"," "))
-marketzips <- read.csv("marketzips.csv",header=T, na.strings = c("","NA"," "))
-equipmentcodes <- read.csv("equipmentcodes.csv",header=T, na.strings = c("","NA"," "))
+spotfreight <- read.csv("spotfreightdata.csv",header=T, na.strings = c("","NA"," "))    # 37699 obs
+regionlookups <- read.csv("regionlookups.csv",header=T, na.strings = c("","NA"," "))    # 906 obs
+marketzips <- read.csv("marketzips.csv",header=T, na.strings = c("","NA"," "))          # 905 obs
+equipmentcodes <- read.csv("equipmentcodes.csv",header=T, na.strings = c("","NA"," "))  # 292 obs
 
 library(dplyr)
 library(lubridate)
 library(plyr)
 
-#View(spotfreight)
+# View(spotfreight)
 # View(regionlookups)
 # View(marketzips)
 # View(equipmentcodes)
@@ -33,8 +33,8 @@ str(equipmentcodes)
 summary(equipmentcodes)
 
 # Preprocessing the data
-sum(is.na(spotfreight)) # checks for any rows with NA in the spotfreight data
-spotfreight <- na.omit(spotfreight) # removes all the rows with NA in one or more columns
+sum(is.na(spotfreight)) # checks for any rows with NA in the spotfreight data = 5620 na's 
+spotfreight <- na.omit(spotfreight) # removes all the rows with NA in one or more columns =  34693 records 
 summary(complete.cases(spotfreight)) # checks if any of the rows has NAs in any of its columns of the spotfreight data
 
 
@@ -92,10 +92,18 @@ arrange(summarise(group_by(spotfreight, CUSTOMER_MILES), orders = n()), desc(-CU
 spotfreight <- spotfreight[!(spotfreight$CUSTOMER_MILES == 0),] 
 n_distinct(spotfreight) # 26166 (99 records with 0 CUSTOMER_MILES excluded )
 
-# check & understand equipments types
+# check & understand equipments types and add 2 new columns based on the values in equipmentcodes dataframe and equipment_type value in spotfreight data frame
 summary(spotfreight$EQUIPMENT_TYPE)
 equipments <- arrange(summarise(group_by(spotfreight, EQUIPMENT_TYPE), orders = n()), desc(orders))
-n_distinct()
+spotfreight$Equipment_New_Abbr <- equipmentcodes[match(spotfreight$EQUIPMENT_TYPE, equipmentcodes$EQUIPMENT_TYPE),2]
+names(spotfreight)[names(spotfreight) == 'Equipment_New_Abbr'] <- 'EQUIPMENT_NEW_ABBR' # renames a column name from old to a new name
+summary(spotfreight$EQUIPMENT_NEW_ABBR)
+spotfreight$EQUIPMENT_TYPE_DESC <- equipmentcodes[match(spotfreight$EQUIPMENT_TYPE, equipmentcodes$EQUIPMENT_TYPE),3]
+summary(spotfreight$EQUIPMENT_TYPE_DESC)
+
+spotfreight_Missing_EQUIPMENT_TYPE <- spotfreight[is.na(spotfreight$EQUIPMENT_NEW_ABBR) | is.na(spotfreight$EQUIPMENT_TYPE_DESC),]
+spotfreight <- na.omit(spotfreight) # 95records removed for which EQUIPMENT_ABBR / EQUIPMENT_TYPE_DESC isn't found from equipmentcodes dataframe based on the eequipment type code in spotfreight data frame
+summary(complete.cases(spotfreight)) # 26071 obs.
 
 # check & remove records with zero or negative CUSTOMER_MILES
 summary(spotfreight$CUSTOMER_MILES)
