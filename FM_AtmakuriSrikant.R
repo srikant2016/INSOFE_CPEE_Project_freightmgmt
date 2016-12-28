@@ -60,8 +60,28 @@ cat("Unique orders count : " , length(unique(spotfreight$ORDER_NBR))) # 23512
 spotfreight_unq <- spotfreight[!duplicated(spotfreight[,!(colnames(spotfreight) %in% c("CREATED_DATE"))]), ]
 
 # remove records with alphanumeric zip codes either in FIRST_PICK_ZIP or LAST_DELIVERY_ZIP or both
+spotfreight$FIRST_PICK_ZIP <- gsub("[ -]", "", spotfreight$FIRST_PICK_ZIP) # removes space and - characters from FIRST_PICK_ZIP
+spotfreight$LAST_DELIVERY_ZIP <- gsub("[ -]", "", spotfreight$LAST_DELIVERY_ZIP) # removes space and - characters from LAST_DELIVERY_ZIP
+
+check.numeric <- function(N){ !length(grep("[^[:digit:]]", as.character(N)))}
+
+spotfreight$VALID_DELIVERY_ZIP <- sapply(spotfreight$LAST_DELIVERY_ZIP, check.numeric)
+spotfreight$VALID_DELIVERY_ZIP <- sapply(spotfreight$LAST_DELIVERY_ZIP, check.numeric)
+
 as.numeric(spotfreight$FIRST_PICK_ZIP)
 which(is.na(as.numeric(as.character(spotfreight$FIRST_PICK_ZIP))))
+sum(is.na(as.numeric(as.character(spotfreight$FIRST_PICK_ZIP))))
+sapply(spotfreight$FIRST_PICK_ZIP, length(gsub("[:digit:]", "", unique(spotfreight$FIRST_PICK_ZIP))
+sapply()
+gsub("\\D+", "", "V2S7W6",ignore.case = TRUE)
+gsub("[:digit:]", "", "67119",ignore.case = TRUE)
+gsub("[ -]", "", " N5W 6C7")
+L1W 3H9
+N5W 6C7
+spotfreight$FIRST_PICK_ZIP<-gsub("[\\S+-]", "", spotfreight$FIRST_PICK_ZIP)
+!is.na(as.numeric(spotfreight$FIRST_PICK_ZIP))
+check.numeric <- function(N){ !length(grep("[^[:digit:]]", as.character(N)))}
+check.numeric("0")
 # check & remove records with NA or zero values in ORDER_COST field (the target variable)
 
 # check & remove records with zero or negative WEIGHT 
