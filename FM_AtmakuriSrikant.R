@@ -93,8 +93,8 @@ spotfreight <- spotfreight[!(spotfreight$CUSTOMER_MILES == 0),]
 n_distinct(spotfreight) # 26166 (99 records with 0 CUSTOMER_MILES excluded )
 
 # check & understand equipments types and add 2 new columns based on the values in equipmentcodes dataframe and equipment_type value in spotfreight data frame
-summary(spotfreight$EQUIPMENT_TYPE)
-equipments <- arrange(summarise(group_by(spotfreight, EQUIPMENT_TYPE), orders = n()), desc(orders))
+summary(spotfreight$EQUIPMENT_TYPE) # this is to understand how many different types of equipments are avaialable in the given raw  data
+equipments <- arrange(summarise(group_by(spotfreight, EQUIPMENT_TYPE), orders = n()), desc(orders)) # this is to understand how orders with what equipment type code in the raw data
 spotfreight$Equipment_New_Abbr <- equipmentcodes[match(spotfreight$EQUIPMENT_TYPE, equipmentcodes$EQUIPMENT_TYPE),2]
 names(spotfreight)[names(spotfreight) == 'Equipment_New_Abbr'] <- 'EQUIPMENT_NEW_ABBR' # renames a column name from old to a new name
 summary(spotfreight$EQUIPMENT_NEW_ABBR)
@@ -112,25 +112,16 @@ spotfreight <- spotfreight[!(spotfreight$CUSTOMER_MILES == 0),]
 n_distinct(spotfreight) # 26166 (99 records with 0 CUSTOMER_MILES excluded )
 
 
-which(is.na(as.numeric(as.character(spotfreight$FIRST_PICK_ZIP))))
-sum(is.na(as.numeric(as.character(spotfreight$FIRST_PICK_ZIP))))
-sapply(spotfreight$FIRST_PICK_ZIP, length(gsub("[:digit:]", "", unique(spotfreight$FIRST_PICK_ZIP))
-gsub("\\D+", "", "V2S7W6",ignore.case = TRUE)
-gsub("[:digit:]", "", "67119",ignore.case = TRUE)
-gsub("[ -]", "", " N5W 6C7")
-L1W 3H9
-N5W 6C7
-spotfreight$FIRST_PICK_ZIP<-gsub("[\\S+-]", "", spotfreight$FIRST_PICK_ZIP)
-!is.na(as.numeric(spotfreight$FIRST_PICK_ZIP))
-check.numeric <- function(N){ !length(grep("[^[:digit:]]", as.character(N)))}
-check.numeric("0")
-
-
- 
-
-# 
-
-
+#which(is.na(as.numeric(as.character(spotfreight$FIRST_PICK_ZIP))))
+#sum(is.na(as.numeric(as.character(spotfreight$FIRST_PICK_ZIP))))
+#sapply(spotfreight$FIRST_PICK_ZIP, length(gsub("[:digit:]", "", unique(spotfreight$FIRST_PICK_ZIP))
+#gsub("\\D+", "", "V2S7W6",ignore.case = TRUE)
+#gsub("[:digit:]", "", "67119",ignore.case = TRUE)
+#gsub("[ -]", "", " N5W 6C7")
+#spotfreight$FIRST_PICK_ZIP<-gsub("[\\S+-]", "", spotfreight$FIRST_PICK_ZIP)
+#!is.na(as.numeric(spotfreight$FIRST_PICK_ZIP))
+#check.numeric <- function(N){ !length(grep("[^[:digit:]]", as.character(N)))}
+#check.numeric("0")
 
 
 dfOrders <- as.data.frame(count(spotfreight$ORDER_NBR)) # creates a data frame with order number and corresponding frequency (repeation count)
@@ -201,5 +192,5 @@ spotfreight1 <- as.data.frame(cbind(spotfreight1,
                                     PICK_EARLY_APPT_YEAR = year(px2), PICK_EARLY_APPT_MONTH = month(px2), PICK_EARLY_APPT_DAY = day(px2),
                                     PICK_EARLY_APPT_YEAR = year(px3), PICK_EARLY_APPT_MONTH = month(px3), PICK_EARLY_APPT_DAY = day(px3),
                                     PICK_EARLY_APPT_YEAR = year(px4), PICK_EARLY_APPT_MONTH = month(px4), PICK_EARLY_APPT_DAY = day(px4),
-                                    PICK_EARLY_APPT_YEAR = year(px5), PICK_EARLY_APPT_MONTH = month(px5), PICK_EARLY_APPT_DAY = day(px5),
+                                    PICK_EARLY_APPT_YEAR = year(px5), PICK_EARLY_APPT_MONTH = month(px5), PICK_EARLY_APPT_DAY = day(px5)
                                     ))
