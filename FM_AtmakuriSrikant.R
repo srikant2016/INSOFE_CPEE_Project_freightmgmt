@@ -1,14 +1,17 @@
 rm(list=ls(all=TRUE))
-#rm(list=c('spotfreight1'))
 
 #setwd("C:\\Srikant\\INSOFE\\Projects\\Freight Management\\Dataset_QuickFreight")
 setwd("D:\\github_repo\\INSOFE_CPEE_Project_freightmgmt")
 
 ################################################## Reads all Data & basic understanding of it ############################################################
-spotfreight <- read.csv("spotfreightdata.csv",header=T, na.strings = c("","NA"," "))    # 37699 obs
+spotfreight_raw <- read.csv("spotfreightdata.csv",header=T, na.strings = c("","NA"," "))    # 37699 obs
 regionlookups <- read.csv("regionlookups.csv",header=T, na.strings = c("","NA"," "))    # 906 obs
 marketzips <- read.csv("marketzips.csv",header=T, na.strings = c("","NA"," "))          # 905 obs
 equipmentcodes <- read.csv("equipmentcodes.csv",header=T, na.strings = c("","NA"," "))  # 292 obs
+
+#install(plyr)
+#install(dplyr)
+#install(lubridate)
 
 library(plyr)
 library(dplyr)
@@ -20,6 +23,7 @@ library(lubridate)
 # View(equipmentcodes)
 
 # Understanding the data
+spotfreight <- spotfreight_raw
 str(spotfreight)
 summary(spotfreight)
 
@@ -164,18 +168,41 @@ spotfreight$LAST_DELIVERY_EARLY_APPT <- as.POSIXlt(spotfreight$LAST_DELIVERY_EAR
 spotfreight$LAST_DELIVERY_LATE_APPT <- as.POSIXlt(spotfreight$LAST_DELIVERY_LATE_APPT, format="%m/%d/%Y %H:%M", tz="GMT")
 spotfreight$CREATED_DATE <- as.POSIXlt(spotfreight$CREATED_DATE, format="%m/%d/%Y %H:%M", tz="GMT")
 
-spotfreight1 <- spotfreight[, !(colnames(spotfreight) %in% c("FIRST_PICK_EARLY_APPT","FIRST_PICK_LATE_APPT","LAST_DELIVERY_EARLY_APPT", "LAST_DELIVERY_LATE_APPT", "CREATED_DATE"))]
-colnames(spotfreight1)
+PICK_EARLY_APPT_YEAR = year(spotfreight$FIRST_PICK_EARLY_APPT) 
+PICK_EARLY_APPT_MONTH = month(spotfreight$FIRST_PICK_EARLY_APPT) 
+PICK_EARLY_APPT_DAY = day(spotfreight$FIRST_PICK_EARLY_APPT)
+PICK_LATE_APPT_YEAR = year(spotfreight$FIRST_PICK_LATE_APPT) 
+PICK_LATE_APPT_MONTH = month(spotfreight$FIRST_PICK_LATE_APPT) 
+PICK_LATE_APPT_DAY = day(spotfreight$FIRST_PICK_LATE_APPT)
+DELIVERY_EARLY_APPT_YEAR = year(spotfreight$LAST_DELIVERY_EARLY_APPT) 
+DELIVERY_EARLY_APPT_MONTH = month(spotfreight$LAST_DELIVERY_EARLY_APPT) 
+DELIVERY_EARLY_APPT_DAY = day(spotfreight$LAST_DELIVERY_EARLY_APPT)
+DELIVERY_LATE_APPT_YEAR = year(spotfreight$LAST_DELIVERY_LATE_APPT) 
+DELIVERY_LATE_APPT_MONTH = month(spotfreight$LAST_DELIVERY_LATE_APPT) 
+DELIVERY_LATE_APPT_DAY = day(spotfreight$LAST_DELIVERY_LATE_APPT)
+CREATED_DATE_YEAR = year(spotfreight$CREATED_DATE) 
+CREATED_DATE_MONTH = month(spotfreight$CREATED_DATE) 
+CREATED_DATE_DAY = day(spotfreight$CREATED_DATE)
 
+spotfreight <- spotfreight[, !(colnames(spotfreight) %in% c("FIRST_PICK_EARLY_APPT","FIRST_PICK_LATE_APPT","LAST_DELIVERY_EARLY_APPT", "LAST_DELIVERY_LATE_APPT", "CREATED_DATE"))]
+ncol(spotfreight)
+colnames(spotfreight)
 
-spotfreight1 <- within(spotfreight, as.data.frame(cbind(spotfreight1, 
-                                    PICK_EARLY_APPT_YEAR = year(FIRST_PICK_EARLY_APPT), PICK_EARLY_APPT_MONTH = month(FIRST_PICK_EARLY_APPT), PICK_EARLY_APPT_DAY = day(FIRST_PICK_EARLY_APPT),
-                                    PICK_LATE_APPT_YEAR = year(FIRST_PICK_LATE_APPT), PICK_LATE_APPT_MONTH = month(FIRST_PICK_LATE_APPT), PICK_LATE_APPT_DAY = day(FIRST_PICK_LATE_APPT),
-                                    DELIVERY_EARLY_APPT_YEAR = year(LAST_DELIVERY_EARLY_APPT), DELIVERY_EARLY_APPT_MONTH = month(LAST_DELIVERY_EARLY_APPT), DELIVERY_EARLY_APPT_DAY = day(LAST_DELIVERY_EARLY_APPT),
-                                    DELIVERY_LATE_APPT_YEAR = year(LAST_DELIVERY_LATE_APPT), DELIVERY_LATE_APPT_MONTH = month(LAST_DELIVERY_LATE_APPT), DELIVERY_LATE_APPT_DAY = day(LAST_DELIVERY_LATE_APPT),
-                                    CREATED_DATE_YEAR = year(CREATED_DATE), CREATED_DATE_MONTH = month(CREATED_DATE), CREATED_DATE_DAY = day(CREATED_DATE)
-                                    )))
+spotfreight <- cbind(spotfreight, 
+                      PICK_EARLY_APPT_YEAR, PICK_EARLY_APPT_MONTH, PICK_EARLY_APPT_DAY,
+                      PICK_LATE_APPT_YEAR, PICK_LATE_APPT_MONTH, PICK_LATE_APPT_DAY,
+                      DELIVERY_EARLY_APPT_YEAR, DELIVERY_EARLY_APPT_MONTH, DELIVERY_EARLY_APPT_DAY,
+                      DELIVERY_LATE_APPT_YEAR, DELIVERY_LATE_APPT_MONTH, DELIVERY_LATE_APPT_DAY,
+                      CREATED_DATE_YEAR, CREATED_DATE_MONTH, CREATED_DATE_DAY)
+ncol(spotfreight)
+colnames(spotfreight)
 
+# remove the temporarily created vectors
+rm(list=c("PICK_EARLY_APPT_YEAR", "PICK_EARLY_APPT_MONTH", "PICK_EARLY_APPT_DAY",
+          "PICK_LATE_APPT_YEAR", "PICK_LATE_APPT_MONTH", "PICK_LATE_APPT_DAY",
+          "DELIVERY_EARLY_APPT_YEAR", "DELIVERY_EARLY_APPT_MONTH", "DELIVERY_EARLY_APPT_DAY",
+          "DELIVERY_LATE_APPT_YEAR", "DELIVERY_LATE_APPT_MONTH", "DELIVERY_LATE_APPT_DAY",
+          "CREATED_DATE_YEAR", "CREATED_DATE_MONTH", "CREATED_DATE_DAY"))
 
 ################################################## References ############################################################
 # Error :  "Error in n(): function should not be called directly"
